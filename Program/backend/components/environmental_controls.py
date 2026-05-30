@@ -22,9 +22,9 @@ class AirFlowSystem:
             
         if fuel_rate_kgs > 0.01:
             afr_ratio = actual_afr / self.optimal_afr
-            # [HIGH FIX] Kurva efisiensi eksponensial yang lebih agresif
-            efficiency_factor = math.exp(-0.8 * ((afr_ratio - 1.0) ** 2))
-            self.efficiency_factor = max(0.1, min(1.0, efficiency_factor))
+            # [FIXED] Kurva efisiensi lebih lenient: memungkinkan AFR 0.7-1.3
+            efficiency_factor = math.exp(-2.0 * ((afr_ratio - 1.0) ** 2))
+            self.efficiency_factor = max(0.5, min(1.0, efficiency_factor))
         else:
             self.efficiency_factor = 0.0
             
@@ -41,7 +41,8 @@ class BoilerWaterLevel:
         max_feedwater_rate_kgs = config.MAX_FEEDWATER_RATE_KGS
         feedwater_rate_kgs = (water_inlet_pct / 100.0) * max_feedwater_rate_kgs
         
-        k_level = 300.0 
+        # [FIXED] k_level diperbesar agar water level lebih stabil (kurang responsive)
+        k_level = 1000.0  # Dari 300.0 → 1000.0 (lebih inertia)
         delta_level = ((feedwater_rate_kgs - steam_flow_kgs) / k_level) * dt
         
         self.water_level_pct += delta_level
@@ -50,7 +51,8 @@ class BoilerWaterLevel:
         return self.water_level_pct
     
     def get_temperature_impact(self):
-        # [CRITICAL FIX] Dampak pendinginan (menyerap energi) dikalkulasi secara presisi
+        # [FIXED] Dampak pendinginan: JANGAN kalikan dengan 1000
+        # ENTHALPY sudah dalam MW, langsung gunakan tanpa konversi
         h_feedwater_inlet = config.ENTHALPY_FEED_WATER
         h_feedwater_outlet = config.ENTHALPY_STEAM_OUT
         delta_h_feedwater = h_feedwater_outlet - h_feedwater_inlet
@@ -58,5 +60,6 @@ class BoilerWaterLevel:
         actual_feedwater_kgs = (self.water_inlet_pct / 100.0) * config.MAX_FEEDWATER_RATE_KGS
         energy_for_feedwater_mw = actual_feedwater_kgs * delta_h_feedwater
         
-        dt_impact = -(energy_for_feedwater_mw * 1000) / (config.BOILER_MASS * config.CP_BOILER)
+        # [FIXED] Jangan × 1000, karena ENTHALPY_RISE sudah dalam MW·s/kg
+        dt_impact = -(energy_for_feedwater_mw) / (config.BOILER_MASS * config.CP_BOILER)
         return dt_impact

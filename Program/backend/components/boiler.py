@@ -17,6 +17,7 @@ class Boiler:
         dt_temp_from_inlet = self.water_level.get_temperature_impact() * dt
         
         # 3. Update suhu boiler (Energi Masuk - Energi Keluar - Pendinginan)
+        # [FIXED] Formula disesuaikan dengan CP_BOILER yang sudah diperbaiki
         dt_temp_from_flow = ((q_in_mw - q_out_mw) / (config.BOILER_MASS * config.CP_BOILER)) * dt
         self.temperature += dt_temp_from_flow + dt_temp_from_inlet
         
