@@ -5,19 +5,14 @@ class Turbine:
         self.p_mech_mw = 0.0
 
     def calculate_power(self, steam_flow_kgs, t_boiler, p_boiler):
-        """
-        Rumus: P_mech = m_steam * Delta_H * Efisiensi
-        """
-        # Penurunan entalpi dikoreksi berdasarkan deviasi suhu dan tekanan dari titik nominal
-        temp_ratio = t_boiler / config.NOMINAL_TEMP
-        press_ratio = p_boiler / config.NOMINAL_PRESSURE
+        # [REVISI] Pendekatan deviasi linear yang presisi (Aproksimasi Deret Taylor)
+        t_deviation = (t_boiler - config.NOMINAL_TEMP) / config.NOMINAL_TEMP * 0.02
+        p_deviation = (p_boiler - config.NOMINAL_PRESSURE) / config.NOMINAL_PRESSURE * 0.05
         
-        delta_h_actual = config.ENTHALPY_DROP_NOMINAL * temp_ratio * press_ratio
+        delta_h_actual = config.ENTHALPY_DROP_NOMINAL * (1.0 + t_deviation + p_deviation)
         
-        # Daya mekanik yang dihasilkan (MW mekanik)
         self.p_mech_mw = steam_flow_kgs * delta_h_actual * config.TURBINE_EFF
         
-        # Mencegah daya minus
         if self.p_mech_mw < 0:
             self.p_mech_mw = 0.0
             
