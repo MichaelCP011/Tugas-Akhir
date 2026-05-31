@@ -103,6 +103,7 @@ export default function App() {
     steam_press: 0.0,
     boiler_temp: 30.0,
     steam_flow: 0.0,
+    water_level: 0.0,
     health: 100.0,
     is_tripped: false,
     alarms: [] as string[]
@@ -144,7 +145,7 @@ export default function App() {
       is_auto: isAuto,
       target_mw: targetMw
     });
-  }, [fuelFeed, steamValve, isAuto, targetMw]);
+  }, [fuelFeed, steamValve, waterInlet, airFlow, isAuto, targetMw]);
 
   const handleSystemCommand = (command: string) => {
     socket.emit('system_command', command);
@@ -266,6 +267,41 @@ export default function App() {
               <span className="text-blue-400 drop-shadow-md">
                 {(waterInlet * 440).toLocaleString()} m³/h
               </span>
+            </div>
+          </div>
+
+          <div className="flex-[3] rounded-md p-3 flex flex-col" style={sectionStyle}>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[10px] font-bold tracking-widest text-gray-400">DRUM WATER LEVEL (%)</span>
+              <span className={`text-xs font-mono font-bold ${simData.water_level > 80 || simData.water_level < 45 ? 'text-red-400 animate-pulse' : 'text-[#00f0ff]'}`}>
+                {simData.water_level.toFixed(1)}%
+              </span>
+            </div>
+
+            {/* Animasi Tangki Air Visual */}
+            <div className="flex-1 w-full relative border border-slate-600 bg-slate-900 rounded-md overflow-hidden shadow-inner">
+              {/* Garis Batas Fatal High (90%) */}
+              <div className="absolute w-full border-t border-red-500/50 border-dashed z-10" style={{ bottom: '90%' }} />
+              {/* Garis Target Optimal (72%) */}
+              <div className="absolute w-full border-t border-green-400/80 border-dashed z-10" style={{ bottom: '72%' }} />
+              {/* Garis Batas Fatal Low (15%) */}
+              <div className="absolute w-full border-t border-red-500/50 border-dashed z-10" style={{ bottom: '15%' }} />
+              
+              {/* Air di dalam drum */}
+              <div 
+                className={`absolute bottom-0 left-0 w-full transition-all duration-500 ${
+                  simData.water_level > 80 ? 'bg-red-500/80' : 
+                  simData.water_level < 45 ? 'bg-yellow-500/80' : 
+                  'bg-blue-500/80'
+                }`}
+                style={{ height: `${Math.min(100, Math.max(0, simData.water_level))}%`, boxShadow: '0 -4px 10px rgba(0,0,0,0.5)' }}
+              />
+            </div>
+            
+            <div className="flex justify-between text-[9px] font-mono mt-1 text-gray-500">
+              <span>TRIP: 15%</span>
+              <span className="text-green-400">TARGET: 72%</span>
+              <span>TRIP: 90%</span>
             </div>
           </div>
 
