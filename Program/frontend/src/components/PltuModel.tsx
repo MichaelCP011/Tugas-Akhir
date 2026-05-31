@@ -7,7 +7,7 @@ export default function PltuModel() {
     <primitive 
       object={scene} 
       scale={60} 
-      position={[0, 7, 3]} 
+      position={[0, 5, 6]} 
     />
   );
 }

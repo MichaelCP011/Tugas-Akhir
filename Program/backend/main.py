@@ -18,7 +18,7 @@ control_state ={
 "target_mw":300.0 
 }
 
-TIME_SCALE_FACTOR =10.0 
+TIME_SCALE_FACTOR =5.0 
 plant =PlantOrchestrator ()
 background_thread =None 
 thread_stop_event =Event ()
