@@ -24,7 +24,7 @@ class PlantOrchestrator :
         self .is_running =False 
         self .boiler .temperature =config .NOMINAL_TEMP 
         self .boiler .pressure =config .NOMINAL_PRESSURE 
-        self .boiler .water_level .water_level_pct =80.0 
+        self .boiler .water_level .water_level_pct =50.0 
         self .alarms .clear ()
 
     def update_step (self ,fuel_feed_tph ,valve_opening_pct ,water_inlet_pct ,air_flow_pct ,dt =1.0 ):

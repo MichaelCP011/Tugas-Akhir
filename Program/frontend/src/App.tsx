@@ -89,7 +89,7 @@ export default function App() {
   const [isAuto, setIsAuto] = useState(false);
   const [fuelFeed, setFuelFeed] = useState(190);
   const [steamValve, setSteamValve] = useState(76);
-  const [waterInlet, setWaterInlet] = useState(80);
+  const [waterInlet, setWaterInlet] = useState(50);
   const [airFlow, setAirFlow] = useState(86);
   const [targetMw, setTargetMw] = useState(300);
 
@@ -99,7 +99,7 @@ export default function App() {
     steam_press: 0.0,
     boiler_temp: 30.0,
     steam_flow: 0.0,
-    water_level: 0.0,
+    water_level: 80.0,
     health: 100.0,
     is_tripped: false,
     alarms: [] as string[]
@@ -422,7 +422,7 @@ export default function App() {
                 <div className="flex items-center gap-2 bg-slate-900 rounded-md p-1 border border-slate-700 shadow-inner">
                    <button onClick={() => setFuelFeed(f => Math.max(0, f - 5))} className="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-md text-gray-300 font-bold active:scale-95 transition">-</button>
                    <span className="text-sm font-mono font-bold text-[#ff003c] drop-shadow-[0_0_5px_#ff003c] w-14 text-center">{fuelFeed.toFixed(1)} t/h</span>
-                   <button onClick={() => setFuelFeed(f => Math.min(220, f + 5))} className="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-md text-gray-300 font-bold active:scale-95 transition">+</button>
+                   <button onClick={() => setFuelFeed(f => Math.min(350, f + 5))} className="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-md text-gray-300 font-bold active:scale-95 transition">+</button>
                 </div>
               </div>
             </div>

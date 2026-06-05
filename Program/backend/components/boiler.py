@@ -9,13 +9,15 @@ class Boiler:
         self.water_level = BoilerWaterLevel()
 
     def update(self, q_in_mw, steam_flow_out_kgs, water_inlet_pct, dt=1.0):
-        self.water_level.update(steam_flow_out_kgs, water_inlet_pct, dt)
+        level_pct, feedwater_kgs = self.water_level.update(steam_flow_out_kgs, water_inlet_pct, dt)
         
-        q_out_mw = steam_flow_out_kgs * config.ENTHALPY_RISE
-        dt_temp_from_inlet = self.water_level.get_temperature_impact() * dt
+        q_steam_out = steam_flow_out_kgs * config.ENTHALPY_STEAM_OUT
+        q_water_in = feedwater_kgs * config.ENTHALPY_FEED_WATER
         
-        dt_temp_from_flow = ((q_in_mw - q_out_mw) / (config.BOILER_MASS * config.CP_BOILER)) * dt
-        self.temperature += dt_temp_from_flow + dt_temp_from_inlet
+        net_heat_mw = q_in_mw + q_water_in - q_steam_out
+        
+        dt_temp = (net_heat_mw / (config.BOILER_MASS * config.CP_BOILER)) * dt
+        self.temperature += dt_temp
         
         if self.temperature < 30.0:
             self.temperature = 30.0
